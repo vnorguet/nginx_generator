@@ -30,4 +30,12 @@ namespace :nginx do
       puts "Unknown tenant name: #{tenant_name}"
     end
   end
+
+  desc "Clear existing config files"
+  task :clear do
+    Dir["generated/*.conf"].each do |file|
+      File.delete(file)
+      puts "#{file} removed"
+    end
+  end
 end
