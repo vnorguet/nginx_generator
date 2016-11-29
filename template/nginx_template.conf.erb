@@ -104,7 +104,7 @@ server {
 <% if tenant.ssl %>
 # Production SSL
 server {
-  listen 443;
+  listen 443 ssl;
   server_name <%= tenant.prod %>;
 
   ssl on;
@@ -113,14 +113,30 @@ server {
 
   ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # don’t use SSLv3 ref: POODLE
 
+  ssl_prefer_server_ciphers on;
+  ssl_session_cache shared:SSL:10m;
+  add_header Strict-Transport-Security "max-age=63072000";
+  add_header X-Frame-Options DENY;
+  add_header X-Content-Type-Options nosniff;
+  ssl_stapling on;
+  ssl_stapling_verify on;
+  ssl_session_cache shared:SSL:10m;
+  ssl_session_timeout 10m;
+
   location / {
     proxy_pass http://<%= tenant.prod_upstream %>;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header Host $http_host;
-    proxy_redirect off;
+
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
+    proxy_set_header Host $http_host;
+
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forward-Proto http;
+    proxy_set_header X-Nginx-Proxy true;
+
+    proxy_redirect off;
   }
 
 }
