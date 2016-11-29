@@ -101,6 +101,7 @@ server {
 
 }
 
+<% if tenant.ssl %>
 # Production SSL
 server {
   listen 443;
@@ -123,3 +124,4 @@ server {
   }
 
 }
+<% end %>

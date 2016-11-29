@@ -1,11 +1,12 @@
 class Tenant
-  attr_accessor :tenant, :domain, :port, :timestamp
+  attr_accessor :tenant, :domain, :port, :timestamp, :ssl
 
-  def initialize(tenant, port, domain)
+  def initialize(tenant, port, domain, ssl)
     @tenant = tenant
     @domain = domain
     @port = port
     @timestamp = Time.now.to_i
+    @ssl = ssl
   end
 
   def stage
