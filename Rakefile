@@ -7,7 +7,7 @@ namespace :nginx do
   task default: %w[gerenate_conf]
 
   desc "Generate NGINX config files for all domains"
-  task :gerenate_all do
+  task :generate_all do
     config = YAML.load_file('config.yml')
 
     config.reject!{|key, value| key.eql?("common")}.each do |tenant_name, tenant_config|
