@@ -1,10 +1,11 @@
 class Tenant
-  attr_accessor :tenant, :domain, :port
+  attr_accessor :tenant, :domain, :port, :timestamp
 
   def initialize(tenant, port, domain)
     @tenant = tenant
     @domain = domain
     @port = port
+    @timestamp = Time.now.to_i
   end
 
   def stage
@@ -35,8 +36,12 @@ class Tenant
     "#{tenant}.conf"
   end
 
+  def timestamped_conf_file_name
+    "#{tenant}.#{timestamp}.conf"
+  end
+
   def generated_file_path
-    "generated/#{conf_file_name}"
+    "generated/#{timestamped_conf_file_name}"
   end
 
 end

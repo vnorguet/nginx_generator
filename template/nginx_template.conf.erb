@@ -9,8 +9,8 @@
 
 ################################# INSTRUCTIONS #################################
 #                                                                              #
-# COPY TO /etc/nginx/site-available/<%= tenant.conf_file_name %>
-# ENABLE sudo ln -s /etc/nginx/sites-available/<%= tenant.conf_file_name %> /etc/nginx/sites-enabled/
+# COPY TO /etc/nginx/site-available/<%= tenant.timestamped_conf_file_name %>
+# ENABLE sudo ln -s /etc/nginx/sites-available/<%= tenant.timestamped_conf_file_name %> /etc/nginx/sites-enabled/<%= tenant.conf_file_name %>
 #                                                                              #
 ################################################################################
 
@@ -20,6 +20,7 @@
 # DOMAIN: <%= tenant.domain %>
 # STAGE PORT: <%= tenant.stage_port %>
 # PRODUCTION PORT: <%= tenant.prod_port %>
+# VERSION (UTC): <%= Time.now.strftime "%d/%m/%Y_%H:%M:%S" %>
 #                                                                              #
 ################################################################################
 
