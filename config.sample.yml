@@ -1,0 +1,14 @@
+common: &default
+  domain: example.com
+kaboom:
+  <<: *default
+  port: 1
+yvelines:
+  <<: *default
+  port: 2
+tuteur:
+  <<: *default
+  port: 3
+www:
+  <<: *default
+  port: 4
