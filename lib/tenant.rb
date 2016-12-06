@@ -1,12 +1,13 @@
 class Tenant
-  attr_accessor :tenant, :domain, :port, :timestamp, :ssl
+  attr_accessor :tenant, :domain, :port, :timestamp, :enable_ssl, :enable_stage
 
-  def initialize(tenant, port, domain, ssl)
+  def initialize(tenant, config)
     @tenant = tenant
-    @domain = domain
-    @port = port
+    @domain = config['domain']
+    @port = config['port']
+    @enable_ssl = config['enable_ssl']
+    @enable_stage = config['enable_stage']
     @timestamp = Time.now.to_i
-    @ssl = ssl
   end
 
   def stage
@@ -43,6 +44,14 @@ class Tenant
 
   def generated_file_path
     "generated/#{timestamped_conf_file_name}"
+  end
+
+  def enable_stage?
+    enable_stage
+  end
+
+  def enable_ssl?
+    enable_ssl
   end
 
 end

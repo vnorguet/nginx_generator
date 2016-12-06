@@ -11,7 +11,7 @@ namespace :nginx do
     config = YAML.load_file('config.yml')
 
     config.reject!{|key, value| key.eql?("common")}.each do |tenant_name, tenant_config|
-      tenant = Tenant.new(tenant_name, tenant_config['port'], tenant_config['domain'], tenant_config['ssl'])
+      tenant = Tenant.new(tenant_name, tenant_config)
       TenantGenerator.generate_conf_file(tenant)
     end
     puts "Install instructions are included in the head of each these files"
@@ -23,7 +23,7 @@ namespace :nginx do
     tenant_name = args[:tenant_name]
     if config.include?(tenant_name)
       tenant_config = config[tenant_name]
-      tenant = Tenant.new(tenant_name, tenant_config['port'], tenant_config['domain'], tenant_config['ssl'])
+      tenant = Tenant.new(tenant_name, tenant_config)
       TenantGenerator.generate_conf_file(tenant)
       puts "Install instructions are included in the head of this file"
     else
