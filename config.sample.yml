@@ -3,12 +3,21 @@ common: &default
 kaboom:
   <<: *default
   port: 1
+  enable_ssl: true
+  enable_stage: true
 yvelines:
   <<: *default
   port: 2
+  enable_ssl: true
+  enable_stage: true
 tuteur:
   <<: *default
   port: 3
+  enable_ssl: true
+  enable_stage: true
 www:
+  domain: 'loiret.fr'
   <<: *default
   port: 4
+  enable_ssl: true
+  enable_stage: true
