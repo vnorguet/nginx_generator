@@ -17,3 +17,9 @@ Copy config.sample.yml to config.sample and fill it appropriately
 `rake nginx:gerenate_all`
 
 Your files are generated to "generated" folder
+
+This tool can also:
+* Generate the crontab for SSL renewing
+* Convert CSV school list into importable JSON for mongo
+
+Use 'rake -T' for a complete list

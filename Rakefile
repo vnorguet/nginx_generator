@@ -43,7 +43,7 @@ namespace :nginx do
 end
 
 namespace :converter do
-  task default: %w[:csv_to_json]
+  task default: %w[:extract_loiret]
 
   desc "Extract Loiret colleges to json"
   task :extract_loiret, [] do |t, args|
@@ -75,4 +75,13 @@ namespace :converter do
     end
   end
 
+end
+
+namespace :crontab do
+  task default: %w[:generate]
+
+  desc "Generate crontab line"
+  task :generate, [] do
+    sh 'whenever'
+  end
 end
