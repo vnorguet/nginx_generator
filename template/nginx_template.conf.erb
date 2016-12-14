@@ -61,11 +61,6 @@ upstream <%= tenant.prod_upstream %> {
 
 <% if tenant.enable_ssl? %>
 # Production SSL Redirection from HTTP
-server {
-  listen         80;
-  server_name    <%= tenant.prod %>;
-  return         301 https://<%= tenant.prod %>$request_uri;
-}
 
 # Production SSL
 server {
@@ -107,12 +102,13 @@ server {
     proxy_redirect off;
   }
 }
-<% else %>
+<% end %>
 # Production
 server {
   listen 80;
   server_name <%= tenant.prod %>;
 
+  <% if tenant.enable_ssl? %>
   # Rule for legitimate ACME Challenge requests (like /.well-known/acme-challenge/xxxxxxxxx)
   # We use ^~ here, so that we don't check other regexes (for speed-up). We actually MUST cancel
   # other regex checks, because in our other config files have regex rule that denies access to files with dotted names.
@@ -140,6 +136,12 @@ server {
   }
 
   location / {
+    return 301 https://<%= tenant.prod %>$request_uri;
+  }
+
+  <% else %>
+
+  location / {
     proxy_pass http://<%= tenant.prod_upstream %>;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header Host $http_host;
@@ -148,5 +150,5 @@ server {
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
   }
+  <% end %>
 }
-<% end %>

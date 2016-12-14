@@ -17,6 +17,7 @@ class TenantGenerator
       File.open(tenant.generated_file_path, 'w') do |f|
         f.write(result)
         puts "File generated: #{tenant.generated_file_path}"
+        puts "sudo rm /etc/nginx/sites-enabled/#{tenant.conf_file_name} && sudo ln -s /etc/nginx/sites-available/#{tenant.timestamped_conf_file_name} /etc/nginx/sites-enabled/#{tenant.conf_file_name}"
       end
     rescue StandardError => e
       p e.message
