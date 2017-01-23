@@ -1,5 +1,5 @@
 class Tenant
-  attr_accessor :tenant, :domain, :port, :timestamp, :enable_ssl, :enable_stage
+  attr_accessor :tenant, :domain, :port, :timestamp, :enable_ssl, :enable_stage, :www_to_not_www
 
   def initialize(tenant, config)
     @tenant = tenant
@@ -7,6 +7,7 @@ class Tenant
     @port = config['port']
     @enable_ssl = config['enable_ssl']
     @enable_stage = config['enable_stage']
+    @www_to_not_www = config['www_to_not_www']
     @timestamp = Time.now.to_i
   end
 
@@ -52,6 +53,10 @@ class Tenant
 
   def enable_ssl?
     enable_ssl
+  end
+
+  def www_to_not_www?
+    www_to_not_www
   end
 
 end

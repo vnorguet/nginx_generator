@@ -52,16 +52,68 @@ server {
     proxy_set_header Connection "upgrade";
   }
 }
-<% end %>
+<% end -%>
 
 # Production upstream
 upstream <%= tenant.prod_upstream %> {
   server 127.0.0.1:<%= tenant.prod_port %>;
 }
+<% if tenant.www_to_not_www? %>
+# Redirect www to not www both in http and https modes
+server {
+  listen 80;
+  listen 443 ssl;
+  server_name www.<%= tenant.prod %>;
+
+  ssl on;
+  ssl_certificate /etc/letsencrypt/live/www.<%= tenant.prod %>/cert.pem;
+  ssl_certificate_key /etc/letsencrypt/live/www.<%= tenant.prod %>/privkey.pem;
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # don@~Yt use SSLv3 ref: POODLE
+  ssl_prefer_server_ciphers on;
+  ssl_session_cache shared:SSL:10m;
+  # add Strict-Transport-Security to prevent man in the middle attacks
+  add_header Strict-Transport-Security "max-age=31536000";
+  add_header X-Frame-Options DENY;
+  add_header X-Content-Type-Options nosniff;
+  ssl_stapling on;
+  ssl_stapling_verify on;
+  ssl_session_cache shared:SSL:10m;
+  ssl_session_timeout 10m;
+
+  # Rule for legitimate ACME Challenge requests (like /.well-known/acme-challenge/xxxxxxxxx)
+  # We use ^~ here, so that we don't check other regexes (for speed-up). We actually MUST cancel
+  # other regex checks, because in our other config files have regex rule that denies access to files with dotted names.
+  location ^~ /.well-known/acme-challenge/ {
+
+      # Set correct content type. According to this:
+      # https://community.letsencrypt.org/t/using-the-webroot-domain-verification-method/1445/29
+      # Current specification requires "text/plain" or no content header at all.
+      # It seems that "text/plain" is a safe option.
+      default_type "text/plain";
+
+
+      # This directory must be the same as in /etc/letsencrypt/cli.ini
+      # as "webroot-path" parameter. Also don't forget to set "authenticator" parameter
+      # there to "webroot".
+      # Do NOT use alias, use root! Target directory is located here:
+      # /var/www/common/letsencrypt/.well-known/acme-challenge/
+      root /home/ubuntu/ssl_webroot;
+  }
+
+  # Hide /acme-challenge subdirectory and return 404 on all requests.
+  # It is somewhat more secure than letting Nginx return 403.
+  # Ending slash is important!
+  location = /.well-known/acme-challenge/ {
+    return 200;
+  }
+
+  location / {
+    rewrite ^(.*) https://stages3e.loiret.fr$1 permanent;
+  }
+}
+<% end -%>
 
 <% if tenant.enable_ssl? %>
-# Production SSL Redirection from HTTP
-
 # Production SSL
 server {
   listen 443 ssl;
@@ -75,16 +127,14 @@ server {
 
   ssl_prefer_server_ciphers on;
   ssl_session_cache shared:SSL:10m;
-  add_header Strict-Transport-Security "max-age=63072000";
+  # add Strict-Transport-Security to prevent man in the middle attacks
+  add_header Strict-Transport-Security "max-age=31536000";
   add_header X-Frame-Options DENY;
   add_header X-Content-Type-Options nosniff;
   ssl_stapling on;
   ssl_stapling_verify on;
   ssl_session_cache shared:SSL:10m;
   ssl_session_timeout 10m;
-
-  # add Strict-Transport-Security to prevent man in the middle attacks
-  add_header Strict-Transport-Security "max-age=31536000";
 
   location / {
     proxy_pass http://<%= tenant.prod_upstream %>;
@@ -102,8 +152,8 @@ server {
     proxy_redirect off;
   }
 }
-<% end %>
-# Production
+<% end -%>
+# Production SSL Redirection from HTTP
 server {
   listen 80;
   server_name <%= tenant.prod %>;
@@ -150,5 +200,5 @@ server {
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
   }
-  <% end %>
+  <% end -%>
 }
